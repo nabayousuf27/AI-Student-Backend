@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from pydantic import EmailStr
+
 
 app = FastAPI()
 
@@ -12,6 +14,8 @@ class Student(BaseModel):
     name:str
     age: int
     department:str
+    email: str
+    graduated: bool=False
 
 students = []
 
@@ -45,6 +49,33 @@ def update_student(student_id: int , update_value: Student):
             return {"message":"studnet updated succesfully"}
     return{"error":"student mot found"}
     
+@app.get("/students/search")             #Query params automatically work like:
+def search_student(student_name: str):  #/student/search?name=Ali
+    searchList=[]
+    for s in students:
+        if student_name.lower() in s.name.lower():
+            searchList.append(s)
+    return searchList
 
+@app.get("/students/summary")
+def get_students_summary():
+    num_of_graduates = 0 
+    total = len(students)
 
-
+    for s in students:
+        if s.graduated:
+            num_of_graduates += 1
+    return {
+        "total":total,
+        "num_of_graduates":num_of_graduates
+        }
+#or
+# @app.get("/students/summary")
+# def student_summary():
+#     total = len(students)
+#     graduates = sum(1 for s in students if s.is_graduate)
+    
+#     return {
+#         "total_students": total,
+#         "graduates": graduates
+#     }
