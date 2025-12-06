@@ -1,12 +1,12 @@
 #pydantic model
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 class StudentCreate(BaseModel):
     name: str
     age: int
     email: EmailStr
     is_graduate : bool =False
-    
+
 #StudentResponse: Used for sending API data in responses
 
 class StudentResponse(BaseModel):

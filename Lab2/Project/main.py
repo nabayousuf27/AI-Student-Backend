@@ -12,16 +12,17 @@ app = FastAPI(title="Student Management System")
 @app.post("/students/", response_model=schemas.StudentResponse  , status_code=201)   #StudentResponse: Used for sending API data in responses
 def create_student(student: schemas.StudentCreate, db:Session = Depends(get_db)):
     existing = db.query(models.Student).filter(
-        models.Studuent.email == student.email
+        models.Student.email == student.email
     ).first()
 
     if existing:
-        raise HTTPException(staus_code=400, details = "Email already regstered")
+        raise HTTPException(status_code=400, detail = "Email already regstered")
 
     db_student = models.Student(**student.model_dump())       
     db.add(db_student)
     db.commit()
     db.refresh(db_student)
+    return db_student
 
 # READ ALL
 @app.get("/students/", response_model=List[schemas. StudentResponse])
@@ -49,7 +50,7 @@ def update_student(
     if not db_student:
         raise HTTPException (status_code=404, detail="Student not found")
     
-    for key, value in student.dict().items():
+    for key, value in student.model_dump().items():
         setattr(db_student, key, value)
     db.commit()
     db.refresh(db_student)
